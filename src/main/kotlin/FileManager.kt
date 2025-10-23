@@ -34,16 +34,19 @@ class FileManager {
         if (!jsonReg.exists()) {
             jsonReg.writeText("[]")
         }
-        registry = Json.decodeFromString<MutableSet<Registro>>(jsonReg.readText())
 
         // si es el dia siguiente
         if (LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE).toInt()
             != properties.getProperty("lastTimeExec").toInt()) {
 
+            jsonReg.writeText("[]")
+
             // guardar nuevo lastTimeExec
             properties.setProperty("lastTimeExec",LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE).toString())
             FileOutputStream(lastTimeExec).use { properties.store(it, null) }
         }
+
+        registry = Json.decodeFromString<MutableSet<Registro>>(jsonReg.readText())
     }
 
     fun guardarUsuario(usuario: Usuario) {
@@ -74,18 +77,20 @@ class FileManager {
 
     fun addTiempo(usuario: Usuario) {
 
-        if (data.readLines().none { it.split(",").first() == usuario.codigo }) {
+        if (data.readLines().none { it.split(",").first() == usuario.codigo &&
+            it.split(",")[2] == LocalDate.now().toString() }) {
             data.appendText("\n${usuario.codigo},${usuario.nombre},${LocalDate.now()},00:00")
         }
         val lineas = data.readLines().toMutableList()
-        val index = lineas.indexOfFirst { usuario.codigo == it.split(",").first() }
+        val index = lineas.indexOfFirst { usuario.codigo == it.split(",").first() &&
+            LocalDate.now().toString() == it.split(",")[2]}
 
         // ultima conexion (registry) hasta localtime now + tiempo que ya estuvo (lineas)
         val periodoActual = Duration.between(
             LocalTime.parse(registry.find { it.codigo == usuario.codigo }!!.ultimaConexion),LocalTime.now())
 
         val totalTime = LocalTime.parse(
-            lineas.find { usuario.codigo == it.split(",")[0] }!!.split(",").last()
+            lineas[index].split(",").last()
         ).plus(periodoActual)
 
         lineas[index] = "${usuario.codigo},${usuario.nombre},${LocalDate.now()},${totalTime}"
@@ -94,7 +99,8 @@ class FileManager {
     }
 
     fun getTotalTime(codigo: String): String {
-        return data.readLines().find { it.split(",").first() == codigo }!!.split(",").last()
+        return data.readLines().find { it.split(",").first() == codigo &&
+                LocalDate.now().toString() == it.split(",")[2]}!!.split(",").last()
     }
 
 }

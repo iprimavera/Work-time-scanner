@@ -7,6 +7,12 @@ data class Registro(val codigo: String, var isConectado: Boolean, var ultimaCone
 
 fun main() {
 
+    val reset = "\u001B[0m"
+    val rojo = "\u001B[31m"
+    val verde = "\u001B[32m"
+    val amarillo = "\u001B[33m"
+    val cyan = "\u001B[36m"
+
     val files = FileManager()
 
     val usuarios = mutableSetOf<Usuario>()
@@ -23,12 +29,12 @@ fun main() {
             val newUsuario = crearUsuario(codigo)
             usuarios.add(newUsuario)
             files.guardarUsuario(newUsuario)
-            println("Actualmente estas desconectado, vuelve a pasar tu codigo si quieres empezar a inputar")
+            println("${rojo}Actualmente estas desconectado, vuelve a pasar tu codigo si quieres empezar a inputar$reset")
 
         } else if (!files.isConectado(codigo)) {
             val usuario = usuarios.find { it.codigo == codigo }!!
 
-            println("Bienvenid@ ${usuario.nombre}!")
+            println("${verde}Bienvenid@ ${usuario.nombre}!$reset")
 //            println("Hoy has trabajado en total ${} hasta ahora")
             files.switchConectado(codigo)
             files.actualizarRegistro()
@@ -40,23 +46,23 @@ fun main() {
             files.switchConectado(codigo)
             files.actualizarRegistro()
 
-            println("Hasta luego ${usuario.nombre}!")
-            println("Hoy has trabajado en total ${files.getTotalTime(codigo)} hasta ahora")
+            println("${cyan}Hasta luego ${usuario.nombre}!$reset")
+            println("${cyan}Hoy has trabajado en total ${files.getTotalTime(codigo)} hasta ahora$reset")
         }
     }
 }
 
 fun crearUsuario(codigo: String): Usuario {
     while (true) {
-        println("No estas registrado en el sistema.")
+        println("\u001B[31mNo estas registrado en el sistema.\u001B[0m")
         print("Indica tu nombre completo: ")
         val nombre = readln()
         print("Indica tu correo electronico: ")
         val correo = readln()
         clear()
-        println(" *** La informacion es correcta?")
+        println("\u001B[33m *** La informacion es correcta?")
         println("     Nombre completo: $nombre")
-        println("     Correo electronico: $correo")
+        println("     Correo electronico: $correo\u001B[0m")
         println()
         print(" [y/n] : ")
         clear()

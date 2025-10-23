@@ -1,5 +1,9 @@
+import kotlinx.serialization.Serializable
 
 data class Usuario(val codigo: String, val nombre: String, val correo: String)
+
+@Serializable
+data class Registro(val codigo: String, var isConectado: Boolean, var ultimaConexion: String)
 
 fun main() {
 
@@ -15,14 +19,30 @@ fun main() {
         codigo = readln()
         clear()
 
-        if (!usuarios.any { it.codigo == codigo }) {
+        if (!usuarios.any { it.codigo == codigo }) { // si no existe lo creo
             val newUsuario = crearUsuario(codigo)
             usuarios.add(newUsuario)
             files.guardarUsuario(newUsuario)
             println("Actualmente estas desconectado, vuelve a pasar tu codigo si quieres empezar a inputar")
-        }
 
-//        if (files.)
+        } else if (!files.isConectado(codigo)) {
+            val usuario = usuarios.find { it.codigo == codigo }!!
+
+            println("Bienvenid@ ${usuario.nombre}!")
+//            println("Hoy has trabajado en total ${} hasta ahora")
+            files.switchConectado(codigo)
+            files.actualizarRegistro()
+
+        } else {
+            val usuario = usuarios.find { it.codigo == codigo }!!
+
+            files.addTiempo(usuario)
+            files.switchConectado(codigo)
+            files.actualizarRegistro()
+
+            println("Hasta luego ${usuario.nombre}!")
+            println("Hoy has trabajado en total ${files.getTotalTime(codigo)} hasta ahora")
+        }
     }
 }
 

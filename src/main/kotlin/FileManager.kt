@@ -80,7 +80,7 @@ class FileManager {
 
         if (data.readLines().none { it.split(",").first() == usuario.codigo &&
             it.split(",")[2] == LocalDate.now().toString() }) {
-            data.appendText("\n${usuario.codigo},${usuario.nombre},${LocalDate.now()},00:00")
+            data.appendText("${usuario.codigo},${usuario.nombre},${LocalDate.now()},00:00\n")
         }
         val lineas = data.readLines().toMutableList()
         val index = lineas.indexOfFirst { usuario.codigo == it.split(",").first() &&

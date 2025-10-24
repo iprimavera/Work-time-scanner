@@ -30,7 +30,6 @@ class FileManager {
         if (!lastTimeExec.exists()) properties.load(defaultProperties)
         else FileInputStream(lastTimeExec).use { properties.load(it) }
         if (!data.exists()) data.writeText("Codigo,Usuario,Fecha,Tiempo")
-        if (!userInfo.exists()) userInfo.writeText("")
         if (!jsonReg.exists()) {
             jsonReg.writeText("[]")
         }
@@ -54,9 +53,11 @@ class FileManager {
     }
 
     fun cargarUsuarios(usuarios: MutableSet<Usuario>) {
-        for (usuario in userInfo.readLines()) {
-            val datos = usuario.split(",")
-            usuarios.add(Usuario(datos[0],datos[1],datos[2]))
+        if (userInfo.exists()) {
+            for (usuario in userInfo.readLines()) {
+                val datos = usuario.split(",")
+                usuarios.add(Usuario(datos[0], datos[1], datos[2]))
+            }
         }
     }
 
